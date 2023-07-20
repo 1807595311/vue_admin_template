@@ -3,60 +3,62 @@ import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
-// create an axios instance
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
-  // withCredentials: true, // send cookies when cross-domain requests
+  baseURL: process.env.VUE_APP_BASE_API,
+  // withCredentials: true, // 发送cookie时，跨域请求
   timeout: 5000 // request timeout
 })
 
-// request interceptor
+// 请求拦截器
 service.interceptors.request.use(
   config => {
-    // do something before request is sent
+    //  在发送请求之前做些什么
 
     if (store.getters.token) {
-      // let each request carry token
-      // ['X-Token'] is a custom headers key
-      // please modify it according to the actual situation
-      config.headers['X-Token'] = getToken()
+      // 让每个请求都带有令牌
+      //  [' x token']是自定义标头键
+      // 请根据实际情况修改 Authorization
+      // config.headers['X-Token'] = getToken()
+      config.headers['Authorization'] = getToken()
     }
     return config
   },
   error => {
-    // do something with request error
-    console.log(error) // for debug
+    // 做一些请求错误
+    console.log(error)
     return Promise.reject(error)
   }
 )
 
-// response interceptor
+// 响应拦截器
 service.interceptors.response.use(
   /**
-   * If you want to get http information such as headers or status
-   * Please return  response => response
+   * 如果您想获得HTTP信息，如标头或状态
+   * return  response => response
   */
 
   /**
-   * Determine the request status by custom code
-   * Here is just an example
-   * You can also judge the status by HTTP Status Code
+   * 根据自定义代码确定请求状态
+   * 这里只是一个例子
+   * 您也可以通过ttp状态码来判断状态
    */
   response => {
     const res = response.data
-
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    // 根据后端状态码调整
+    // 后端的状态码为 status 所以同步修改
+    res.code = res.status
+    if (res.code !== 0) {
+      console.log('22222 :>> ', 22222);
       Message({
-        message: res.message || 'Error',
+        message: res.msg || 'Error',
         type: 'error',
         duration: 5 * 1000
       })
 
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
+      // 50008: 非法令牌;50012:其他客户端已登录;50014:令牌过期;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
         // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
+        MessageBox.confirm('您已退出登录，您可以取消以留在此页面上，或重新登录', '确认退出登录', {
           confirmButtonText: 'Re-Login',
           cancelButtonText: 'Cancel',
           type: 'warning'

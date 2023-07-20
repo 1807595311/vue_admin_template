@@ -24,7 +24,7 @@ const users = {
 }
 
 module.exports = [
-  // user login
+  // 用户登录
   {
     url: '/vue-admin-template/user/login',
     type: 'post',
@@ -41,13 +41,13 @@ module.exports = [
       }
 
       return {
-        code: 20000,
+        code: 0,
         data: token
       }
     }
   },
 
-  // get user info
+  // 获取用户信息
   {
     url: '/vue-admin-template/user/info\.*',
     type: 'get',
@@ -59,24 +59,24 @@ module.exports = [
       if (!info) {
         return {
           code: 50008,
-          message: 'Login failed, unable to get user details.'
+          message: '登录失败，无法获取用户详细信息'
         }
       }
 
       return {
-        code: 20000,
+        code: 0,
         data: info
       }
     }
   },
 
-  // user logout
+  // 退出登录
   {
     url: '/vue-admin-template/user/logout',
     type: 'post',
     response: _ => {
       return {
-        code: 20000,
+        code: 0,
         data: 'success'
       }
     }
